@@ -24,30 +24,31 @@ log = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 QUIZ_SYSTEM_PROMPT = (
-    "Du bist ein anspruchsvoller Professor für Digital Business Models. "
-    "Dir liegen die folgenden Vorlesungsinhalte vor:\n\n"
+    "Du bist ein anspruchsvoller Professor für Organisation & Projektmanagement (OPM, FH Aachen, Dr. Axel Emunds). "
+    "Dir liegen die folgenden Vorlesungsinhalte und Skripte vor:\n\n"
     "{context}\n\n"
-    "Stelle dem Studierenden EINE zufällige, fordernde Verständnisfrage zu "
-    "den Inhalten (z. B. zu PESTEL, Double Diamond, Opportunity Spaces, "
-    "Geschäftsmodellmustern, Value Proposition Canvas, Jobs-to-be-done usw.). "
+    "Stelle dem Studierenden EINE zufällige, fordernde Verständnis- oder Anwendungsfrage zu "
+    "den Inhalten (z. B. zu ZESPORT-Kriterien, Kuster-Matrix, Tuckman-Phasen, Belbin-Rollen, "
+    "Auftragsklärung nach Dr. Emunds, Arbeit im vs. am System, DIN 69901 / ISO 21500, "
+    "Gewinner-Gewinner-Modell, Projektgrößen nach Jakoby, AFB I-III). "
     "Die Frage soll zum Nachdenken anregen und nicht trivial sein. "
     "Gib NUR die Frage aus – keine Antwort, keine Erklärung."
 )
 
 EVAL_SYSTEM_PROMPT = (
-    "Du bist ein kritischer Professor für Digital Business Models. "
+    "Du bist ein kritischer Professor für Organisation & Projektmanagement (OPM, FH Aachen). "
     "Bewerte die folgende Antwort des Studierenden auf die Frage.\n\n"
     "**Frage:** {question}\n\n"
     "**Antwort des Studierenden:** {answer}\n\n"
     "Gib eine kritische, aber faire Bewertung ab. "
-    "Erkläre, was richtig ist und was fehlt oder falsch ist. "
+    "Erkläre präzise, was fachlich richtig ist und was fehlt oder ungenau war (orientiert an Dr. Emunds / OPM). "
     "Gib am Ende eine Note (1-6, deutsches Notensystem) und eine kurze Begründung. "
     "Antworte auf Deutsch."
 )
 
 
 def _load_materials() -> str:
-    """Lädt alle .txt- und .pdf-Dateien aus data/ und gibt den Text zurück."""
+    """Lädt alle .txt-, .md- und .pdf-Dateien aus data/ und gibt den Text zurück."""
     if not DATA_DIR.exists():
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         return ""
@@ -56,7 +57,7 @@ def _load_materials() -> str:
 
     for file in sorted(DATA_DIR.iterdir()):
         try:
-            if file.suffix.lower() == ".txt":
+            if file.suffix.lower() in (".txt", ".md"):
                 texts.append(file.read_text(encoding="utf-8"))
             elif file.suffix.lower() == ".pdf":
                 texts.append(_extract_pdf(file))
@@ -237,7 +238,7 @@ class QuizCog(commands.Cog):
             return
 
         embed = discord.Embed(
-            title="🎓 Quiz – Digital Business Models",
+            title="🎓 Quiz – Organisation & Projektmanagement (OPM)",
             description=question,
             color=discord.Color.purple(),
         )
